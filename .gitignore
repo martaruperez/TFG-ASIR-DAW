@@ -11,3 +11,7 @@ override.tf.json
 terraform.tfvars
 *.tfvars
 *.backup
+*.deb
+*.zip
+*.tar.gz
+*.log
