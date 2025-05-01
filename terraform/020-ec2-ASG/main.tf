@@ -1,6 +1,6 @@
 resource "aws_launch_template" "app_lt" {
   name_prefix = "tfg-app-lt"
-  image_id = "ami-05c870a0c8f773e2c"
+  image_id = "ami-040911809b3de45f6"
   instance_type = "t2.micro"
 
   vpc_security_group_ids = [aws_security_group.instance_sg.id]
