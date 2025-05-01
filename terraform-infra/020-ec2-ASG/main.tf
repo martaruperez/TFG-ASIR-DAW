@@ -1,17 +1,10 @@
 resource "aws_launch_template" "app_lt" {
   name_prefix = "tfg-app-lt"
-  image_id = "ami-0faab6bdbac9486fb"
-  instance_type = "t3.micro"
+  image_id = "ami-05c870a0c8f773e2c"
+  instance_type = "t2.micro"
 
-  user_data = base64encode(<<-EOF
-   #!/bin/bash
-   yum update -y
-   yum install -y httpd
-   systemctl enable httpd
-   systemctl start httpd
-   echo "Hola desde ASG!" > /var/www/html/index.html
- EOF
-  )
+  vpc_security_group_ids = [aws_security_group.instance_sg.id]
+
 
   tag_specifications {
     resource_type = "instance"

@@ -1,0 +1,6 @@
+- name: Configurar instancia hola-mundo con Nginx
+  hosts: web
+  become: true
+
+  roles:
+    - nginx
