@@ -15,3 +15,10 @@ module "asg" {
   target_group_arn = module.alb.target_group_arn
   alb_sg_id = module.alb.alb_sg_id
 }
+
+module "bbdd" {
+  source = "./030-bbdd"
+  vpc_id = module.vpc.vpc_id
+  private_db_subnet_id = module.vpc.private_db_subnet_id
+  asg_instance_sg_id  = module.asg.asg_instance_sg_id
+}
