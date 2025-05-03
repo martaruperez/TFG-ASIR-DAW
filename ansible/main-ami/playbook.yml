@@ -1,0 +1,6 @@
+- name: Instancia WordPress para AMI
+  hosts: all
+  become: yes
+
+  roles:
+    - wordpress

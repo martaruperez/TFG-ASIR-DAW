@@ -1,0 +1,64 @@
+- name: Instalar paquetes necesarios
+  apt:
+    name: 
+      - docker.io
+      - unzip
+    state: present
+    update_cache: yes
+
+- name: Habilitar y arrancar Docker
+  systemd:
+    name: docker
+    enabled: yes
+    state: started
+
+- name: Crear directorio para WordPress
+  file:
+    path: /opt/wordpress
+    state: directory
+
+- name: Copiar tema OceanWP a la instancia
+  copy:
+    src: oceanwp.zip
+    dest: /opt/wordpress/oceanwp.zip
+
+- name: Crear contenedor WordPress con volumen persistente
+  docker_container:
+    name: wordpress
+    image: wordpress:latest
+    ports:
+      - "80:80"
+    env:
+      WORDPRESS_DB_HOST: "<IP_PRIVADA_DE_LA_DB>"
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: wp_user
+      WORDPRESS_DB_PASSWORD: wp_pass
+    volumes:
+      - wordpress_data:/var/www/html
+    restart_policy: always
+
+- name: Esperar a que WordPress esté listo (ping al puerto 80)
+  wait_for:
+    port: 80
+    delay: 10
+    timeout: 60
+
+- name: Copiar el tema al contenedor
+  shell: docker cp /opt/wordpress/oceanwp.zip wordpress:/var/www/html/
+
+- name: Instalar unzip y WP-CLI en el contenedor
+  shell: |
+    docker exec wordpress bash -c "
+    apt update &&
+    apt install -y unzip curl php-cli &&
+    curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar &&
+    chmod +x wp-cli.phar &&
+    mv wp-cli.phar /usr/local/bin/wp"
+  args:
+    warn: false
+
+- name: Extraer tema OceanWP
+  command: docker exec wordpress unzip /var/www/html/oceanwp.zip -d /var/www/html/wp-content/themes/
+
+- name: Activar tema OceanWP
+  command: docker exec wordpress wp theme activate oceanwp --allow-root
