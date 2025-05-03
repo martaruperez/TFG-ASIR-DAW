@@ -23,7 +23,7 @@ resource "aws_security_group" "db_sg" {
 }
 
 resource "aws_instance" "mysql_db" {
-  ami                         = "ami-040911809b3de45f6"
+  ami                         = "ami-0fd511a8758cbc40d"
   instance_type               = "t2.micro"
   subnet_id                   = var.private_db_subnet_id
   vpc_security_group_ids      = [aws_security_group.db_sg.id]

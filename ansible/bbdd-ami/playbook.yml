@@ -1,0 +1,6 @@
+- name: Configurar instancia MySQL para crear AMI
+  hosts: bbdd
+  become: true
+
+  roles:
+    - mariadb

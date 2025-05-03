@@ -1,0 +1,40 @@
+- name: Actualizar paquetes
+  apt:
+    update_cache: yes
+  become: yes
+
+- name: Instalar MariaDB
+  apt:
+    name: mariadb-server
+    state: present
+    update_cache: true
+
+- name: Asegurar que MariaDB está activo
+  service:
+    name: mariadb
+    state: started
+    enabled: true
+
+# - name: Crear base de datos inicial 
+#   mysql_db:
+#     name: wordpress
+#     state: present
+
+# - name: Crear usuario para WordPress 
+#   mysql_user:
+#     name: wp_user
+#     password: wp_pass
+#     priv: 'wordpress.*:ALL'
+#     host: '%'
+#     state: present
+
+- name: Permitir acceso remoto a mariaDB 
+  lineinfile:
+    path: /etc/mysql/mariadb.conf.d/50-server.cnf
+    regexp: '^bind-address'
+    line: 'bind-address = 0.0.0.0'
+
+- name: Reiniciar 
+  systemd:
+    name: mariadb
+    state: restarted
