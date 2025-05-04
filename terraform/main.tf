@@ -22,3 +22,7 @@ module "bbdd" {
   private_db_subnet_id = module.vpc.private_db_subnet_id
   asg_instance_sg_id  = module.asg.asg_instance_sg_id
 }
+
+module "s3" {
+  source = "./040-s3"
+}

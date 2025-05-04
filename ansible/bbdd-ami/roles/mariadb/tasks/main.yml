@@ -3,6 +3,14 @@
     update_cache: yes
   become: yes
 
+- name: Instalar dependencias para usar community.mysql
+  apt:
+    name:
+      - python3-pymysql
+      - python3-mysqldb
+    state: present
+    update_cache: yes
+
 - name: Instalar MariaDB
   apt:
     name: mariadb-server
@@ -15,18 +23,39 @@
     state: started
     enabled: true
 
-# - name: Crear base de datos inicial 
-#   mysql_db:
-#     name: wordpress
-#     state: present
+- name: Instalar AWS CLI
+  apt:
+    name: awscli
+    state: present
+    update_cache: yes
 
-# - name: Crear usuario para WordPress 
-#   mysql_user:
-#     name: wp_user
-#     password: wp_pass
-#     priv: 'wordpress.*:ALL'
-#     host: '%'
-#     state: present
+- name: Copiar script de backup
+  copy:
+    src: backup.sh
+    dest: /usr/local/bin/backup.sh
+    mode: '0755'
+
+- name: Crear cronjob para ejecutar el backup cada día a las 2:00
+  cron:
+    name: "Backup diario BBDD a S3"
+    minute: "0"
+    hour: "2"
+    job: "/usr/local/bin/backup.sh"
+
+- name: Crear base de datos inicial
+  community.mysql.mysql_db:
+    name: "{{ db_name }}"
+    state: present
+  become: true
+
+- name: Crear usuario para WordPress
+  community.mysql.mysql_user:
+    name: "{{ db_user }}"
+    password: "{{ db_password }}"
+    priv: "{{ db_name }}.*:ALL"
+    host: '%'
+    state: present
+  become: true
 
 - name: Permitir acceso remoto a mariaDB 
   lineinfile:

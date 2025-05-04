@@ -108,7 +108,7 @@ resource "aws_route_table" "private_app_a" {
   vpc_id = aws_vpc.main.id
 
   route {
-    cidr_block              = "0.0.0.0/0"
+    cidr_block = "0.0.0.0/0"
     network_interface_id    = aws_instance.nat_1a.primary_network_interface_id
   }
 
@@ -122,7 +122,7 @@ resource "aws_route_table" "private_app_b" {
   vpc_id = aws_vpc.main.id
 
   route {
-    cidr_block              = "0.0.0.0/0"
+    cidr_block = "0.0.0.0/0"
     network_interface_id    = aws_instance.nat_1b.primary_network_interface_id
   }
 

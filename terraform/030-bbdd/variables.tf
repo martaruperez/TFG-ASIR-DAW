@@ -3,9 +3,9 @@ variable "vpc_id" {
 }
 
 variable "asg_instance_sg_id" {
-  type        = string
+  type = string
 }
 
 variable "private_db_subnet_id" {
-  type        = string
+  type = string
 }

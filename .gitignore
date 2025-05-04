@@ -16,3 +16,4 @@ terraform.tfvars
 *.tar.gz
 *.log
 *.pem
+ansible/*/vars/secrets.yml

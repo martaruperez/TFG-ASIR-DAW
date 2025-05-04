@@ -1,12 +1,12 @@
 resource "aws_security_group" "db_sg" {
-  name        = "tfg-db-sg"
+  name = "tfg-db-sg"
   description = "permitir acceso a MySQL a las instacias del ASG"
   vpc_id      = var.vpc_id
 
   ingress {
-    from_port       = 3306
-    to_port         = 3306
-    protocol        = "tcp"
+    from_port = 3306
+    to_port = 3306
+    protocol = "tcp"
     security_groups = [var.asg_instance_sg_id]
   }
 
@@ -23,9 +23,9 @@ resource "aws_security_group" "db_sg" {
 }
 
 resource "aws_instance" "mysql_db" {
-  ami                         = "ami-0fd511a8758cbc40d"
-  instance_type               = "t2.micro"
-  subnet_id                   = var.private_db_subnet_id
+  ami    = "ami-0fd511a8758cbc40d"
+  instance_type  = "t2.micro"
+  subnet_id     = var.private_db_subnet_id
   vpc_security_group_ids      = [aws_security_group.db_sg.id]
   associate_public_ip_address = false
 
