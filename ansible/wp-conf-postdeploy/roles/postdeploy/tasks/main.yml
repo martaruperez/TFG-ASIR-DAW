@@ -1,0 +1,13 @@
+- name: Cargar outputs de Terraform
+  set_fact:
+    terraform_outputs: "{{ lookup('file', '../../../terraform-outputs.json') | from_json }}"
+
+- name: Establecer URL del ALB
+  set_fact:
+    alb_url: "{{ terraform_outputs.wordpress_url.value }}"
+
+- name: Reemplazar localhost por la URL del ALB en la base de datos
+  shell: >
+    docker exec wordpress wp search-replace 'http://localhost' '{{ alb_url }}' --allow-root
+  args:
+    executable: /bin/bash

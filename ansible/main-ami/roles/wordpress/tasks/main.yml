@@ -3,6 +3,7 @@
     name: 
       - docker.io
       - unzip
+      - mariadb-client
     state: present
     update_cache: yes
 
@@ -29,10 +30,10 @@
     ports:
       - "80:80"
     env:
-      WORDPRESS_DB_HOST: "<IP_PRIVADA_DE_LA_DB>"
-      WORDPRESS_DB_NAME: wordpress
-      WORDPRESS_DB_USER: wp_user
-      WORDPRESS_DB_PASSWORD: wp_pass
+      WORDPRESS_DB_HOST: "{{ db_host }}"
+      WORDPRESS_DB_NAME: "{{ db_name }}"
+      WORDPRESS_DB_USER: "{{ db_user }}" 
+      WORDPRESS_DB_PASSWORD: "{{ db_password }}"
     volumes:
       - wordpress_data:/var/www/html
     restart_policy: always
@@ -43,22 +44,44 @@
     delay: 10
     timeout: 60
 
-- name: Copiar el tema al contenedor
-  shell: docker cp /opt/wordpress/oceanwp.zip wordpress:/var/www/html/
+- name: Descargar WP-CLI
+  shell: docker exec wordpress curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 
-- name: Instalar unzip y WP-CLI en el contenedor
-  shell: |
-    docker exec wordpress bash -c "
-    apt update &&
-    apt install -y unzip curl php-cli &&
-    curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar &&
-    chmod +x wp-cli.phar &&
-    mv wp-cli.phar /usr/local/bin/wp"
-  args:
-    warn: false
+- name: Dar permisos de ejecución a WP-CLI
+  shell: docker exec wordpress chmod +x wp-cli.phar
 
-- name: Extraer tema OceanWP
-  command: docker exec wordpress unzip /var/www/html/oceanwp.zip -d /var/www/html/wp-content/themes/
+- name: Mover WP-CLI a /usr/local/bin/wp
+  shell: docker exec wordpress mv wp-cli.phar /usr/local/bin/wp
+
+- name: Verificar instalación de WP-CLI
+  shell: docker exec wordpress wp --info
+
+
+- name: Crear directorio destino para descomprimir OceanWP
+  file:
+    path: /opt/wordpress/oceanwp
+    state: directory
+
+- name: Extraer tema OceanWP en la instancia
+  unarchive:
+    src: /opt/wordpress/oceanwp.zip
+    dest: /opt/wordpress/oceanwp
+    remote_src: yes
+
+- name: Copiar tema descomprimido al contenedor
+  shell: docker cp /opt/wordpress/oceanwp/oceanwp wordpress:/var/www/html/wp-content/themes/
+
+- name: Instalar WordPress si no está instalado
+  shell: >
+    docker exec wordpress wp core is-installed --allow-root ||
+    docker exec wordpress wp core install
+    --url=http://localhost
+    --title="{{ wp_title }}"
+    --admin_user={{ wp_admin_user }}
+    --admin_password={{ wp_admin_password }}
+    --admin_email={{ wp_admin_email }}
+    --skip-email
+    --allow-root
 
 - name: Activar tema OceanWP
   command: docker exec wordpress wp theme activate oceanwp --allow-root

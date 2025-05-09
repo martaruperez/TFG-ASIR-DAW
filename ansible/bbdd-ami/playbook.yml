@@ -1,6 +1,9 @@
-- name: Configurar instancia MySQL para crear AMI
+- name: Configurar instancia con BBDD para crear AMI
   hosts: bbdd
   become: true
+
+  vars_files:
+  - vars/secrets.yml
 
   roles:
     - mariadb

@@ -11,6 +11,7 @@ module "alb" {
 module "asg" {
   source = "./020-ec2-ASG"
   vpc_id = module.vpc.vpc_id
+  private_app_subnet_ids = module.vpc.private_app_subnet_ids
   public_subnet_ids = module.vpc.public_subnet_ids
   target_group_arn = module.alb.target_group_arn
   alb_sg_id = module.alb.alb_sg_id

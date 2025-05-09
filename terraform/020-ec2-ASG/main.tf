@@ -1,10 +1,10 @@
 resource "aws_launch_template" "app_lt" {
   name_prefix = "tfg-app-lt"
-  image_id = "ami-040911809b3de45f6"
+  image_id = "ami-0e8b8c49c46481bad"
   instance_type = "t2.micro"
 
   vpc_security_group_ids = [aws_security_group.instance_sg.id]
-
+  key_name = "tfg-demo-ami"
 
   tag_specifications {
     resource_type = "instance"
@@ -18,7 +18,7 @@ resource "aws_autoscaling_group" "app_asg" {
   desired_capacity  = 1
   max_size  = 1
   min_size  = 1
-  vpc_zone_identifier  = var.public_subnet_ids
+  vpc_zone_identifier  = var.private_app_subnet_ids
   target_group_arns    = [var.target_group_arn]
   launch_template {
     id   = aws_launch_template.app_lt.id
@@ -42,7 +42,12 @@ resource "aws_security_group" "instance_sg" {
     protocol = "tcp"
     security_groups = [var.alb_sg_id]
   }
-
+    ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]  
+    }
   egress {
     from_port   = 0
     to_port  = 0

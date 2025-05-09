@@ -1,0 +1,7 @@
+- name: Reconfigurar WordPress con URL del ALB
+  hosts: wordpress
+  become: yes
+  vars_files:
+    - vars/main.yml
+  roles:
+    - postdeploy

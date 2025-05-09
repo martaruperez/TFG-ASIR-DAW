@@ -1,2 +1,2 @@
 [bbdd]
-34.244.104.200 ansible_user=admin ansible_ssh_private_key_file=../../tfg-demo-ami.pem
+54.170.4.32 ansible_user=admin ansible_ssh_private_key_file=../../tfg-demo-ami.pem

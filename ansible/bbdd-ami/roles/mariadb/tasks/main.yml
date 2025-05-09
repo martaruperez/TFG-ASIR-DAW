@@ -35,7 +35,14 @@
     dest: /usr/local/bin/backup.sh
     mode: '0755'
 
-- name: Crear cronjob para ejecutar el backup cada día a las 2:00
+- name: Instalar cron
+  apt:
+    name: cron
+    state: present
+    update_cache: yes
+
+
+- name: Crear cronjob para ejecutar el backup cada día a las 2:00am
   cron:
     name: "Backup diario BBDD a S3"
     minute: "0"
@@ -46,7 +53,8 @@
   community.mysql.mysql_db:
     name: "{{ db_name }}"
     state: present
-  become: true
+    login_user: "{{ admin_user }}"
+    login_password: "{{ admin_password }}"
 
 - name: Crear usuario para WordPress
   community.mysql.mysql_user:
@@ -55,7 +63,8 @@
     priv: "{{ db_name }}.*:ALL"
     host: '%'
     state: present
-  become: true
+    login_user: "{{ admin_user }}"
+    login_password: "{{ admin_password }}"
 
 - name: Permitir acceso remoto a mariaDB 
   lineinfile:

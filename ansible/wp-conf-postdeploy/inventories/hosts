@@ -1,0 +1,2 @@
+[wordpress]
+i-0dea93da031210e5a ansible_connection=aws_ssm
