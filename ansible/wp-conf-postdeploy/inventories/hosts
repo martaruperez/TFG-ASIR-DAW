@@ -1,2 +1,2 @@
 [wordpress]
-i-0dea93da031210e5a ansible_connection=aws_ssm
+i-091f0a9a4c04cb396 ansible_connection=aws_ssm ansible_python_interpreter=/home/mruperez/Desktop/TFG-ASIR-DAW/ansible/wp-conf-postdeploy/venv/bin/python

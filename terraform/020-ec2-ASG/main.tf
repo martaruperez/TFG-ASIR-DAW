@@ -12,6 +12,18 @@ resource "aws_launch_template" "app_lt" {
    Name = "tfg-app-instance"
     }
   }
+  
+  user_data = base64encode(<<-EOF
+    #!/bin/bash
+    snap install amazon-ssm-agent --classic
+    systemctl enable amazon-ssm-agent
+    systemctl start amazon-ssm-agent
+  EOF
+  )
+
+  iam_instance_profile {
+    name = aws_iam_instance_profile.ssm_instance_profile.name
+  }
 }
 
 resource "aws_autoscaling_group" "app_asg" {
