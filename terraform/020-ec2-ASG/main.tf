@@ -1,6 +1,6 @@
 resource "aws_launch_template" "app_lt" {
   name_prefix = "tfg-app-lt"
-  image_id = "ami-0e8b8c49c46481bad"
+  image_id = "ami-0c2bd79b938bf340e"
   instance_type = "t2.micro"
 
   vpc_security_group_ids = [aws_security_group.instance_sg.id]
@@ -12,15 +12,6 @@ resource "aws_launch_template" "app_lt" {
    Name = "tfg-app-instance"
     }
   }
-  
-  user_data = base64encode(<<-EOF
-    #!/bin/bash
-    snap install amazon-ssm-agent --classic
-    systemctl enable amazon-ssm-agent
-    systemctl start amazon-ssm-agent
-  EOF
-  )
-
   iam_instance_profile {
     name = aws_iam_instance_profile.ssm_instance_profile.name
   }
@@ -54,12 +45,12 @@ resource "aws_security_group" "instance_sg" {
     protocol = "tcp"
     security_groups = [var.alb_sg_id]
   }
-    ingress {
+  ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]  
-    }
+  }
   egress {
     from_port   = 0
     to_port  = 0
@@ -70,4 +61,24 @@ resource "aws_security_group" "instance_sg" {
   tags = {
     Name = "tfg-asg-instance-sg"
   }
+}
+
+
+#temporal: para debug
+resource "aws_iam_role_policy" "allow_s3_logs" {
+  name = "allow-logs-to-s3"
+  role = aws_iam_role.ssm_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "s3:PutObject"
+        ],
+        Resource = "arn:aws:s3:::tfg-marta-db-backups/ssm-logs/*"
+      }
+    ]
+  })
 }

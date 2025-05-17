@@ -6,8 +6,37 @@
   set_fact:
     alb_url: "{{ terraform_outputs.wordpress_url.value }}"
 
+- name: Instalar WordPress si no está instalado
+  shell: >
+    docker exec wordpress wp core is-installed --allow-root ||
+    docker exec wordpress wp core install
+    --url={{ alb_url }}
+    --title="TFG WordPress"
+    --admin_user=admin
+    --admin_password=superSegura007
+    --admin_email=ruperez.jimenez.marta@gmail.com
+    --skip-email
+    --allow-root
+  args:
+    executable: /bin/bash
+
 - name: Reemplazar localhost por la URL del ALB en la base de datos
   shell: >
     docker exec wordpress wp search-replace 'http://localhost' '{{ alb_url }}' --allow-root
   args:
     executable: /bin/bash
+
+- name: Activar tema OceanWP
+  shell: docker exec wordpress wp theme activate oceanwp --allow-root
+  args:
+    executable: /bin/bash
+
+- name: Verificar que WordPress está instalado correctamente
+  shell: docker exec wordpress wp core version --allow-root
+  register: wp_version_output
+  args:
+    executable: /bin/bash
+
+- name: Mostrar versión de WordPress
+  debug:
+    var: wp_version_output.stdout

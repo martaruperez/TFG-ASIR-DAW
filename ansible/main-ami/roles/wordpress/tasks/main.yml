@@ -1,3 +1,27 @@
+# - name: Instalar dependencias para SSM
+#   apt:
+#     name:
+#       - curl
+#       - wget
+#       - unzip
+#     state: present
+#     update_cache: yes
+
+# - name: Descargar agente de SSM
+#   get_url:
+#     url: https://s3.eu-west-1.amazonaws.com/amazon-ssm-eu-west-1/latest/debian_amd64/amazon-ssm-agent.deb
+#     dest: /tmp/amazon-ssm-agent.deb
+
+# - name: Instalar agente de SSM
+#   apt:
+#     deb: /tmp/amazon-ssm-agent.deb
+
+# - name: Habilitar y arrancar el agente SSM
+#   systemd:
+#     name: amazon-ssm-agent
+#     enabled: yes
+#     state: started
+
 - name: Instalar paquetes necesarios
   apt:
     name: 
@@ -71,17 +95,15 @@
 - name: Copiar tema descomprimido al contenedor
   shell: docker cp /opt/wordpress/oceanwp/oceanwp wordpress:/var/www/html/wp-content/themes/
 
-- name: Instalar WordPress si no está instalado
-  shell: >
-    docker exec wordpress wp core is-installed --allow-root ||
-    docker exec wordpress wp core install
-    --url=http://localhost
-    --title="{{ wp_title }}"
-    --admin_user={{ wp_admin_user }}
-    --admin_password={{ wp_admin_password }}
-    --admin_email={{ wp_admin_email }}
-    --skip-email
-    --allow-root
+# - name: Instalar WordPress si no está instalado
+#   shell: >
+#     docker exec wordpress wp core is-installed --allow-root ||
+#     docker exec wordpress wp core install
+#     --url=http://localhost
+#     --title="{{ wp_title }}"
+#     --admin_user={{ wp_admin_user }}
+#     --admin_password={{ wp_admin_password }}
+#     --admin_email={{ wp_admin_email }}
+#     --skip-email
+#     --allow-root
 
-- name: Activar tema OceanWP
-  command: docker exec wordpress wp theme activate oceanwp --allow-root

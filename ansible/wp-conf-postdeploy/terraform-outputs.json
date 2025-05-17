@@ -1,0 +1,7 @@
+{
+  "wordpress_url": {
+    "sensitive": false,
+    "type": "string",
+    "value": "http://tfg-alb-70824753.eu-west-1.elb.amazonaws.com"
+  }
+}
